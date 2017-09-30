@@ -438,3 +438,21 @@ template {
  */
 [hidden] {
   display: none; }
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Caslon', Times, serif; }
+
+.header-container {
+  background: #232323; }
+  .header-container .chatter-box-title-container {
+    font-size: 3.5em;
+    margin: 0 0 50px 0;
+    padding: 30px 0 30px 0;
+    text-align: center; }
+    .header-container .chatter-box-title-container .chatter-logo {
+      color: #22ac9c;
+      margin-right: 20px; }
+    .header-container .chatter-box-title-container .chatter-box-title {
+      color: #ffffff; }

@@ -2,5 +2,9 @@
 @import 'variables';
 // Importing the Eric Myers reset file for the css file
 @import 'reset';
-// Importing the noramlize css file to reset the styles
+// Importing the normalize css file to reset the styles
 @import 'normalize';
+// Import the global styles css file
+@import 'global';
+// Import the css styles for the header
+@import 'header';
