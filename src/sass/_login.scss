@@ -1,10 +1,27 @@
 #login_container {
-  border: 1px solid black;
-  border-radius: 5px;
-  height: 200px;
-  left: 35%;
+  @include border-radius(3px);
+  background: $primary-black;
+  height: 225px;
+  margin: 0 auto;
   padding: 20px;
-  position: absolute;
-  top: 40%;
-  width: 450px;
+  width: 45%;
+
+  .user-login-title {
+    color: $white;
+    font-size: 22px;
+  }
+  .login-input-container {
+    margin-top: 25px;
+  }
+  .login-btn {
+    background: $white;
+    color: $primary-black;
+    float: right;
+    margin-top: 10px;
+
+    &:hover {
+      background: $primary-teal;
+      border: 1px solid $primary-teal;
+    }
+  }
 }

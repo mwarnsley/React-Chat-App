@@ -51706,6 +51706,9 @@ exports.default = {
   users: {
     currentUser: '',
     activeUsers: []
+  },
+  chats: {
+    openChats: []
   }
 };
 
@@ -51756,7 +51759,13 @@ var _UserList = __webpack_require__(383);
 
 var _UserList2 = _interopRequireDefault(_UserList);
 
-var _userActions = __webpack_require__(381);
+var _ActiveChat = __webpack_require__(386);
+
+var _ActiveChat2 = _interopRequireDefault(_ActiveChat);
+
+var _CurrentUser = __webpack_require__(385);
+
+var _CurrentUser2 = _interopRequireDefault(_CurrentUser);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -51774,26 +51783,11 @@ var Chat = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, (Chat.__proto__ || Object.getPrototypeOf(Chat)).call(this));
 
-    _this.componentWillMount = function () {
-      var dispatch = _this.props.dispatch;
-
-      _this.socket = (0, _socket2.default)('http://localhost:3000');
-      _this.socket.on('connect', _this.connect);
-      _this.socket.on('disconnect', _this.disconnect);
-      _this.socket.on('messageAdded', _this.messageAdded);
-      _this.socket.on('userJoined', _this.onUserJoin);
-      dispatch((0, _userActions.getActiveusers)());
-    };
-
-    _this.connect = function () {
+    _this.connect = function (socket) {
       _this.setState({
         status: 'connected'
       });
-      console.log('Connected: ' + _this.socket.id);
-    };
-
-    _this.emit = function (eventName, payload) {
-      _this.socket.emit(eventName, payload);
+      console.log('Connected: ' + socket.id);
     };
 
     _this.disconnect = function (users) {
@@ -51827,15 +51821,40 @@ var Chat = function (_Component) {
     };
     return _this;
   }
+  // componentWillMount = () => {
+  //   const {dispatch} = this.props;
+  //   this.socket = io('http://localhost:3000');
+  //   this.socket.on('connect', this.connect);
+  //   this.socket.on('disconnect', this.disconnect);
+  //   this.socket.on('messageAdded', this.messageAdded);
+  //   this.socket.on('userJoined', this.onUserJoin);
+  //   dispatch(getActiveusers());
+  // };
+
+  // emit = (eventName, payload) => {
+  //   console.log('Error Coming');
+  //   this.socket.emit(eventName, payload);
+  // };
+
 
   _createClass(Chat, [{
     key: 'render',
     value: function render() {
-      var activeUsers = this.props.activeUsers;
+      var _props = this.props,
+          activeUsers = _props.activeUsers,
+          dispatch = _props.dispatch;
       var _state = this.state,
           user = _state.user,
           users = _state.users;
 
+      console.log(this.state);
+      //   <Col md={4}>
+      //   <UserList users={users} />
+      // </Col>
+      // <Col md={4}>
+      //   <MessageList {...this.state} />
+      //   <MessageForm user={user} {...this.state} emit={this.emit} />
+      // </Col>
       return _react2.default.createElement(
         'div',
         { id: 'chat_app_container' },
@@ -51853,30 +51872,30 @@ var Chat = function (_Component) {
             )
           )
         ),
-        !user ? _react2.default.createElement(_UserLogin2.default, { emit: this.emit, setUser: this.setUser }) : _react2.default.createElement(
+        !user ? _react2.default.createElement(_UserLogin2.default, _extends({}, this.state, {
+          setUser: this.setUser,
+          connect: this.connect,
+          dispatch: dispatch,
+          onUserJoin: this.onUserJoin
+        })) : _react2.default.createElement(
           'div',
           null,
           _react2.default.createElement(_SideBar2.default, { activeUsers: activeUsers }),
           _react2.default.createElement(
-            'div',
+            _reactBootstrap.Grid,
             { className: 'content-container' },
             _react2.default.createElement(
-              _reactBootstrap.Grid,
+              _reactBootstrap.Row,
               null,
               _react2.default.createElement(
-                _reactBootstrap.Row,
-                null,
-                _react2.default.createElement(
-                  _reactBootstrap.Col,
-                  { md: 4 },
-                  _react2.default.createElement(_UserList2.default, { users: users })
-                ),
-                _react2.default.createElement(
-                  _reactBootstrap.Col,
-                  { md: 4 },
-                  _react2.default.createElement(_MessageList2.default, this.state),
-                  _react2.default.createElement(_MessageForm2.default, _extends({ user: user }, this.state, { emit: this.emit }))
-                )
+                _reactBootstrap.Col,
+                { md: 6 },
+                _react2.default.createElement(_ActiveChat2.default, _extends({ user: user }, this.state, { emit: this.emit }))
+              ),
+              _react2.default.createElement(
+                _reactBootstrap.Col,
+                { md: 6 },
+                _react2.default.createElement(_CurrentUser2.default, null)
               )
             )
           )
@@ -66281,6 +66300,7 @@ var Message = function (_Component) {
       var minutes = dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes();
       var seconds = dt.getSeconds() < 10 ? '0' + dt.getSeconds() : dt.getSeconds();
       var ampm = hours >= 12 ? 'PM' : 'AM';
+
       var newDT = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
 
       return newDT;
@@ -66328,6 +66348,12 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactBootstrap = __webpack_require__(69);
 
+var _socket = __webpack_require__(158);
+
+var _socket2 = _interopRequireDefault(_socket);
+
+var _userActions = __webpack_require__(381);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -66344,17 +66370,30 @@ var UserLogin = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, (UserLogin.__proto__ || Object.getPrototypeOf(UserLogin)).call(this));
 
+    _this.componentWillMount = function () {
+      _this.socket = (0, _socket2.default)('http://localhost:3000');
+    };
+
     _this.loginUser = function () {
       var _this$props = _this.props,
           setUser = _this$props.setUser,
-          emit = _this$props.emit;
+          dispatch = _this$props.dispatch,
+          connect = _this$props.connect,
+          onUserJoin = _this$props.onUserJoin;
 
       var name = _this.state.username;
+      _this.socket.on('connect', connect(_this.socket));
+      _this.socket.on('userJoined', onUserJoin);
       setUser({ name: name });
-      emit('userJoined', { name: name });
+      _this.emit('userJoined', { name: name });
+      dispatch((0, _userActions.getActiveusers)());
       _this.setState({
         username: ''
       });
+    };
+
+    _this.emit = function (eventName, payload) {
+      _this.socket.emit(eventName, payload);
     };
 
     _this.onChange = function (e) {
@@ -66385,17 +66424,25 @@ var UserLogin = function (_Component) {
         { id: 'login_container' },
         _react2.default.createElement(
           'h2',
-          null,
+          { className: 'user-login-title' },
           'User Login'
         ),
+        _react2.default.createElement('hr', null),
         _react2.default.createElement(
           _reactBootstrap.FormGroup,
-          { bsSize: 'large' },
-          _react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true, type: 'text', onKeyDown: this.handleEnterPress, onChange: this.onChange, value: usernameValue, placeholder: 'Choose a Username' })
+          { bsSize: 'large', className: 'login-input-container' },
+          _react2.default.createElement(_reactBootstrap.FormControl, {
+            autoFocus: true,
+            type: 'text',
+            onKeyDown: this.handleEnterPress,
+            onChange: this.onChange,
+            value: usernameValue,
+            placeholder: 'Choose a Username'
+          })
         ),
         _react2.default.createElement(
           _reactBootstrap.Button,
-          { onClick: this.loginUser },
+          { bsSize: 'large', className: 'login-btn', onClick: this.loginUser },
           'Login'
         )
       );
@@ -66418,30 +66465,43 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getActiveusers = getActiveusers;
+exports.setCurrentUser = setCurrentUser;
 var activeUsers = [{
-  username: 'Mark Anthony',
-  profileImage: 'https://cdn.flickeringmyth.com/wp-content/uploads/2015/01/superman-face-those-batman-v-superman-rumors-faked-by-warner-bros.jpeg'
+  username: 'Donald Trump',
+  profileImage: 'http://i2.cdn.cnn.com/cnnnext/dam/assets/160118134132-donald-trump-nigel-parry-large-169.jpg'
 }, {
-  username: 'Terry Walker',
-  profileImage: 'http://cdn3.thr.com/sites/default/files/imagecache/landscape_928x523/2010/12/spider_man_dark_face_2010_a_l.jpg'
+  username: 'Barrack Obama',
+  profileImage: 'http://cdn.history.com/sites/2/2013/11/obama_color-AB.jpeg'
 }, {
-  username: 'Jim Brown',
-  profileImage: 'http://manapop.com/wp-content/uploads/2014/10/the-hulk-eric-bana.jpg'
+  username: 'George W Bush',
+  profileImage: 'http://static.snopes.com/app/uploads/2017/03/George_W_Bush_fb.jpg'
 }, {
-  username: 'Sara Johnson',
-  profileImage: 'https://pbs.twimg.com/profile_images/891457926640136192/WF36X7wE.jpg'
+  username: 'Bill Clinton',
+  profileImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bill_Clinton.jpg/1200px-Bill_Clinton.jpg'
 }, {
-  username: 'Jack Jones',
-  profileImage: 'http://cdn.movieweb.com/img.news.tops/NEMo2SubEosdPS_1_b/Chris-Evans-Talks-Steve-Rogers-And-The-Modern.jpg'
+  username: 'George H W Bush',
+  profileImage: 'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE1ODA0OTcxMjgzODc1MzQx/george-h-walker-bush-38066-1-402.jpg'
 }, {
-  username: 'Stacy Adams',
-  profileImage: 'http://media.comicbook.com/2017/04/wonderwoman-dceu-989128-1280x0.png'
+  username: 'Ronald Regan',
+  profileImage: 'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE5NDg0MDU1MTA5OTkzOTk5/ronald-reagan-9453198-1-402.jpg'
+}, {
+  username: 'Jimmy Carter',
+  profileImage: 'https://www.biography.com/.image/t_share/MTE5NTU2MzE2MTc3MDA4MTM5/jimmy-carter-9240013-1-402.jpg'
 }];
 
+// Gets the list of active users
 function getActiveusers() {
   return {
     type: 'GET_ACTIVE_USERS',
     payload: activeUsers
+  };
+}
+
+// Sets the current user when logging in
+function setCurrentUser(user) {
+  return {
+    type: 'SET_CURRENT_USER',
+    payload: user
   };
 }
 
@@ -66521,6 +66581,371 @@ var UserList = function (_Component) {
 }(_react.Component);
 
 exports.default = UserList;
+
+/***/ }),
+/* 384 */,
+/* 385 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = __webpack_require__(69);
+
+var _MessageForm = __webpack_require__(377);
+
+var _MessageForm2 = _interopRequireDefault(_MessageForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var CurrentUser = function (_Component) {
+  _inherits(CurrentUser, _Component);
+
+  function CurrentUser() {
+    _classCallCheck(this, CurrentUser);
+
+    return _possibleConstructorReturn(this, (CurrentUser.__proto__ || Object.getPrototypeOf(CurrentUser)).apply(this, arguments));
+  }
+
+  _createClass(CurrentUser, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          emit = _props.emit,
+          user = _props.user;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'active-chat-container' },
+        _react2.default.createElement(
+          'h2',
+          { className: 'chat-user' },
+          'Sam'
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'messages-container' },
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'send-message-container' },
+          _react2.default.createElement(
+            _reactBootstrap.FormGroup,
+            { bsSize: 'large' },
+            _react2.default.createElement(_reactBootstrap.FormControl, { className: 'send-new-message', type: 'text', placeholder: 'New Message' })
+          )
+        )
+      );
+    }
+  }]);
+
+  return CurrentUser;
+}(_react.Component);
+
+exports.default = CurrentUser;
+
+/***/ }),
+/* 386 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactBootstrap = __webpack_require__(69);
+
+var _MessageForm = __webpack_require__(377);
+
+var _MessageForm2 = _interopRequireDefault(_MessageForm);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ActiveChat = function (_Component) {
+  _inherits(ActiveChat, _Component);
+
+  function ActiveChat() {
+    _classCallCheck(this, ActiveChat);
+
+    return _possibleConstructorReturn(this, (ActiveChat.__proto__ || Object.getPrototypeOf(ActiveChat)).apply(this, arguments));
+  }
+
+  _createClass(ActiveChat, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          emit = _props.emit,
+          user = _props.user;
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'active-chat-container' },
+        _react2.default.createElement(
+          'h2',
+          { className: 'chat-user' },
+          'Sam'
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'messages-container' },
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          ),
+          _react2.default.createElement(
+            'div',
+            null,
+            'Message'
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'send-message-container' },
+          _react2.default.createElement(
+            _reactBootstrap.FormGroup,
+            { bsSize: 'large' },
+            _react2.default.createElement(_reactBootstrap.FormControl, { className: 'send-new-message', type: 'text', placeholder: 'New Message' })
+          )
+        )
+      );
+    }
+  }]);
+
+  return ActiveChat;
+}(_react.Component);
+
+exports.default = ActiveChat;
 
 /***/ })
 /******/ ]);

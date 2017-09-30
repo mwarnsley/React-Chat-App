@@ -7,6 +7,7 @@ class Message extends Component {
     const minutes = dt.getMinutes() < 10 ? `0${dt.getMinutes()}` : dt.getMinutes();
     const seconds = dt.getSeconds() < 10 ? `0${dt.getSeconds()}` : dt.getSeconds();
     var ampm = hours >= 12 ? 'PM' : 'AM';
+
     const newDT = `${hours}:${minutes}:${seconds} ${ampm}`;
 
     return newDT;

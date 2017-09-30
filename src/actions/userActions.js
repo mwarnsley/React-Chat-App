@@ -1,36 +1,48 @@
 const activeUsers = [
   {
-    username: 'Mark Anthony',
+    username: 'Donald Trump',
+    profileImage: 'http://i2.cdn.cnn.com/cnnnext/dam/assets/160118134132-donald-trump-nigel-parry-large-169.jpg',
+  },
+  {
+    username: 'Barrack Obama',
+    profileImage: 'http://cdn.history.com/sites/2/2013/11/obama_color-AB.jpeg',
+  },
+  {
+    username: 'George W Bush',
+    profileImage: 'http://static.snopes.com/app/uploads/2017/03/George_W_Bush_fb.jpg',
+  },
+  {
+    username: 'Bill Clinton',
+    profileImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bill_Clinton.jpg/1200px-Bill_Clinton.jpg',
+  },
+  {
+    username: 'George H W Bush',
     profileImage:
-      'https://cdn.flickeringmyth.com/wp-content/uploads/2015/01/superman-face-those-batman-v-superman-rumors-faked-by-warner-bros.jpeg',
+      'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE1ODA0OTcxMjgzODc1MzQx/george-h-walker-bush-38066-1-402.jpg',
   },
   {
-    username: 'Terry Walker',
+    username: 'Ronald Regan',
     profileImage:
-      'http://cdn3.thr.com/sites/default/files/imagecache/landscape_928x523/2010/12/spider_man_dark_face_2010_a_l.jpg',
+      'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE5NDg0MDU1MTA5OTkzOTk5/ronald-reagan-9453198-1-402.jpg',
   },
   {
-    username: 'Jim Brown',
-    profileImage: 'http://manapop.com/wp-content/uploads/2014/10/the-hulk-eric-bana.jpg',
-  },
-  {
-    username: 'Sara Johnson',
-    profileImage: 'https://pbs.twimg.com/profile_images/891457926640136192/WF36X7wE.jpg',
-  },
-  {
-    username: 'Jack Jones',
-    profileImage:
-      'http://cdn.movieweb.com/img.news.tops/NEMo2SubEosdPS_1_b/Chris-Evans-Talks-Steve-Rogers-And-The-Modern.jpg',
-  },
-  {
-    username: 'Stacy Adams',
-    profileImage: 'http://media.comicbook.com/2017/04/wonderwoman-dceu-989128-1280x0.png',
+    username: 'Jimmy Carter',
+    profileImage: 'https://www.biography.com/.image/t_share/MTE5NTU2MzE2MTc3MDA4MTM5/jimmy-carter-9240013-1-402.jpg',
   },
 ];
 
+// Gets the list of active users
 export function getActiveusers() {
   return {
     type: 'GET_ACTIVE_USERS',
     payload: activeUsers,
+  };
+}
+
+// Sets the current user when logging in
+export function setCurrentUser(user) {
+  return {
+    type: 'SET_CURRENT_USER',
+    payload: user,
   };
 }

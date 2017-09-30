@@ -3,4 +3,7 @@ export default {
     currentUser: '',
     activeUsers: [],
   },
+  chats: {
+    openChats: [],
+  },
 };

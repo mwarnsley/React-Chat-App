@@ -3,7 +3,11 @@
   padding: 0;
   font-family: 'Caslon', Times, serif;
 }
+body {
+  background: $primary-teal;
+  margin-top: 150px;
+  overflow-x: hidden;
+}
 .content-container {
-  padding-left: 225px;
-  padding-top: 135px;
+  padding-left: 215px;
 }

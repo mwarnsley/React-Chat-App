@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-
 import {FormGroup, FormControl, Button} from 'react-bootstrap';
+import io from 'socket.io-client';
+import {getActiveusers} from '../../actions/userActions';
 
 class UserLogin extends Component {
   constructor() {
@@ -10,14 +11,23 @@ class UserLogin extends Component {
       username: '',
     };
   }
+  componentWillMount = () => {
+    this.socket = io('http://localhost:3000');
+  };
   loginUser = () => {
-    const {setUser, emit} = this.props;
+    const {setUser, dispatch, connect, onUserJoin} = this.props;
     const name = this.state.username;
+    this.socket.on('connect', connect(this.socket));
+    this.socket.on('userJoined', onUserJoin);
     setUser({name});
-    emit('userJoined', {name});
+    this.emit('userJoined', {name});
+    dispatch(getActiveusers());
     this.setState({
       username: '',
     });
+  };
+  emit = (eventName, payload) => {
+    this.socket.emit(eventName, payload);
   };
   onChange = e => {
     const username = e.target.value;
@@ -34,11 +44,21 @@ class UserLogin extends Component {
     const usernameValue = this.state.username;
     return (
       <div id="login_container">
-        <h2>User Login</h2>
-        <FormGroup bsSize="large">
-          <FormControl autoFocus type="text" onKeyDown={this.handleEnterPress} onChange={this.onChange} value={usernameValue} placeholder="Choose a Username" />
+        <h2 className="user-login-title">User Login</h2>
+        <hr />
+        <FormGroup bsSize="large" className="login-input-container">
+          <FormControl
+            autoFocus
+            type="text"
+            onKeyDown={this.handleEnterPress}
+            onChange={this.onChange}
+            value={usernameValue}
+            placeholder="Choose a Username"
+          />
         </FormGroup>
-        <Button onClick={this.loginUser}>Login</Button>
+        <Button bsSize="large" className="login-btn" onClick={this.loginUser}>
+          Login
+        </Button>
       </div>
     );
   }

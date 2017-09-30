@@ -8,8 +8,8 @@ import MessageForm from './Messages/MessageForm';
 import MessageList from './Messages/MessageList';
 import UserLogin from './Login/UserLogin';
 import UserList from './Users/UserList';
-
-import {getActiveusers} from '../actions/userActions';
+import ActiveChat from './Chats/ActiveChat';
+import CurrentUser from './Users/CurrentUser';
 
 class Chat extends Component {
   constructor() {
@@ -27,24 +27,25 @@ class Chat extends Component {
       user: '',
     };
   }
-  componentWillMount = () => {
-    const {dispatch} = this.props;
-    this.socket = io('http://localhost:3000');
-    this.socket.on('connect', this.connect);
-    this.socket.on('disconnect', this.disconnect);
-    this.socket.on('messageAdded', this.messageAdded);
-    this.socket.on('userJoined', this.onUserJoin);
-    dispatch(getActiveusers());
-  };
-  connect = () => {
+  // componentWillMount = () => {
+  //   const {dispatch} = this.props;
+  //   this.socket = io('http://localhost:3000');
+  //   this.socket.on('connect', this.connect);
+  //   this.socket.on('disconnect', this.disconnect);
+  //   this.socket.on('messageAdded', this.messageAdded);
+  //   this.socket.on('userJoined', this.onUserJoin);
+  //   dispatch(getActiveusers());
+  // };
+  connect = socket => {
     this.setState({
       status: 'connected',
     });
-    console.log(`Connected: ${this.socket.id}`);
+    console.log(`Connected: ${socket.id}`);
   };
-  emit = (eventName, payload) => {
-    this.socket.emit(eventName, payload);
-  };
+  // emit = (eventName, payload) => {
+  //   console.log('Error Coming');
+  //   this.socket.emit(eventName, payload);
+  // };
   disconnect = users => {
     this.setState({
       status: 'disconnected',
@@ -62,8 +63,16 @@ class Chat extends Component {
     this.setState({messages});
   };
   render() {
-    const {activeUsers} = this.props;
+    const {activeUsers, dispatch} = this.props;
     const {user, users} = this.state;
+    console.log(this.state);
+    //   <Col md={4}>
+    //   <UserList users={users} />
+    // </Col>
+    // <Col md={4}>
+    //   <MessageList {...this.state} />
+    //   <MessageForm user={user} {...this.state} emit={this.emit} />
+    // </Col>
     return (
       <div id="chat_app_container">
         <div className="header-container">
@@ -73,23 +82,26 @@ class Chat extends Component {
           </h1>
         </div>
         {!user ? (
-          <UserLogin emit={this.emit} setUser={this.setUser} />
+          <UserLogin
+            {...this.state}
+            setUser={this.setUser}
+            connect={this.connect}
+            dispatch={dispatch}
+            onUserJoin={this.onUserJoin}
+          />
         ) : (
           <div>
             <SideBar activeUsers={activeUsers} />
-            <div className="content-container">
-              <Grid>
-                <Row>
-                  <Col md={4}>
-                    <UserList users={users} />
-                  </Col>
-                  <Col md={4}>
-                    <MessageList {...this.state} />
-                    <MessageForm user={user} {...this.state} emit={this.emit} />
-                  </Col>
-                </Row>
-              </Grid>
-            </div>
+            <Grid className="content-container">
+              <Row>
+                <Col md={6}>
+                  <ActiveChat user={user} {...this.state} emit={this.emit} />
+                </Col>
+                <Col md={6}>
+                  <CurrentUser />
+                </Col>
+              </Row>
+            </Grid>
           </div>
         )}
       </div>
