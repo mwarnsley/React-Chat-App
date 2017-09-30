@@ -50,6 +50,19 @@ io.sockets.on('connection', socket => {
     };
     io.emit('messageAdded', newMessage);
   });
+
+  // Add the user when joining
+  socket.on('userJoined', payload => {
+    const newUser = {
+      id: this.id,
+      name: payload.name,
+    };
+
+    users.push(newUser);
+    io.emit('userJoined', users);
+    console.log(`User Joined ${payload.name}`);
+  });
+
   connections.push(socket);
   console.log('Connected: %s sockets connected', connections.length);
 });

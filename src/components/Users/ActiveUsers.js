@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 
-const ActiveUsers = ({username, onClick}) => {
+const ActiveUsers = ({username, profileImage, onClick}) => {
   return (
     <li className="active-user-container" onClick={onClick}>
-      <img className="profile-image" src={'http://lorempixel.com/400/200/'} alt="profile-pic" />
+      <img className="profile-image" src={profileImage} alt="profile-image" />
       <span className="active-user-title">{username}</span>
     </li>
   );

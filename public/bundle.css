@@ -467,6 +467,16 @@ template {
     .header-container .chatter-box-title-container .chatter-box-title {
       color: #ffffff; }
 
+#login_container {
+  border: 1px solid black;
+  border-radius: 5px;
+  height: 200px;
+  left: 35%;
+  padding: 20px;
+  position: absolute;
+  top: 40%;
+  width: 450px; }
+
 #side_bar_container {
   background: #232323;
   height: 100%;
