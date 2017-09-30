@@ -51649,9 +51649,12 @@ var _redux = __webpack_require__(66);
 
 var _userReducer = __webpack_require__(215);
 
+var _chatReducer = __webpack_require__(387);
+
 // Combining the reducers
 exports.default = (0, _redux.combineReducers)({
-  users: _userReducer.userReducer
+  users: _userReducer.userReducer,
+  chats: _chatReducer.chatReducer
 });
 
 /***/ }),
@@ -51688,6 +51691,18 @@ function userReducer() {
         activeUsers: activeUsers
       });
       break;
+    case 'SET_MAIN_USER':
+      var currentUser = action.payload;
+      return _extends({}, state, {
+        currentUser: currentUser
+      });
+      break;
+    case 'SET_USERS_JOINED':
+      var usersJoined = action.payload;
+      return _extends({}, state, {
+        usersJoined: usersJoined
+      });
+      break;
   }
   return state;
 }
@@ -51704,8 +51719,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = {
   users: {
-    currentUser: '',
-    activeUsers: []
+    currentUser: {},
+    activeUsers: [],
+    usersJoined: []
   },
   chats: {
     openChats: []
@@ -51723,8 +51739,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
@@ -51738,6 +51752,8 @@ var _reactBootstrap = __webpack_require__(69);
 var _socket = __webpack_require__(158);
 
 var _socket2 = _interopRequireDefault(_socket);
+
+var _lodash = __webpack_require__(171);
 
 var _SideBar = __webpack_require__(375);
 
@@ -51767,6 +51783,8 @@ var _CurrentUser = __webpack_require__(385);
 
 var _CurrentUser2 = _interopRequireDefault(_CurrentUser);
 
+var _userActions = __webpack_require__(381);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -51783,11 +51801,11 @@ var Chat = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, (Chat.__proto__ || Object.getPrototypeOf(Chat)).call(this));
 
-    _this.connect = function (socket) {
+    _this.connect = function () {
       _this.setState({
         status: 'connected'
       });
-      console.log('Connected: ' + socket.id);
+      console.log('Connected: ' + _this.socket.id);
     };
 
     _this.disconnect = function (users) {
@@ -51798,11 +51816,21 @@ var Chat = function (_Component) {
     };
 
     _this.setUser = function (user) {
-      _this.setState({ user: user });
+      var dispatch = _this.props.dispatch;
+
+      dispatch((0, _userActions.setUser)(user));
+    };
+
+    _this.setMainUser = function (user) {
+      var dispatch = _this.props.dispatch;
+
+      dispatch((0, _userActions.setMainUser)(user));
     };
 
     _this.onUserJoin = function (users) {
-      _this.setState({ users: users });
+      var dispatch = _this.props.dispatch;
+
+      dispatch((0, _userActions.setUsersJoined)(users));
     };
 
     _this.messageAdded = function (message) {
@@ -51810,51 +51838,68 @@ var Chat = function (_Component) {
       _this.setState({ messages: messages });
     };
 
+    _this.emit = function (eventName, payload) {
+      _this.socket.emit(eventName, payload);
+    };
+
+    _this.setChatConnection = function () {
+      var dispatch = _this.props.dispatch;
+
+      _this.socket = (0, _socket2.default)('http://localhost:3000');
+      _this.socket.on('connect', _this.connect);
+      _this.socket.on('disconnect', _this.disconnect);
+      _this.socket.on('messageAdded', _this.messageAdded);
+      _this.socket.on('userJoined', _this.onUserJoin);
+      _this.socket.on('setUser', _this.setUser);
+      _this.socket.on('setMainUser', _this.setMainUser);
+      dispatch((0, _userActions.getActiveusers)());
+    };
+
+    _this.openNewConnection = function (name) {
+      _this.setUser({ name: name });
+      _this.emit('userJoined', { name: name });
+    };
+
+    _this.renderChats = function () {
+      var _this$props = _this.props,
+          openChats = _this$props.openChats,
+          currentUser = _this$props.currentUser;
+
+      var chats = (0, _lodash.map)(openChats, function (chat, i) {
+        return _react2.default.createElement(
+          _reactBootstrap.Row,
+          { key: i },
+          _react2.default.createElement(
+            _reactBootstrap.Col,
+            { md: 6 },
+            _react2.default.createElement(_ActiveChat2.default, { chat: chat })
+          ),
+          _react2.default.createElement(
+            _reactBootstrap.Col,
+            { md: 6 },
+            _react2.default.createElement(_CurrentUser2.default, { username: currentUser.name })
+          )
+        );
+      });
+      return chats;
+    };
+
     _this.state = {
-      status: 'disconnected',
-      messages: [{
-        timeStamp: Date.now(),
-        text: 'Welcome to Chatter Box'
-      }],
-      users: [],
-      user: ''
+      status: 'disconnected'
     };
     return _this;
   }
-  // componentWillMount = () => {
-  //   const {dispatch} = this.props;
-  //   this.socket = io('http://localhost:3000');
-  //   this.socket.on('connect', this.connect);
-  //   this.socket.on('disconnect', this.disconnect);
-  //   this.socket.on('messageAdded', this.messageAdded);
-  //   this.socket.on('userJoined', this.onUserJoin);
-  //   dispatch(getActiveusers());
-  // };
-
-  // emit = (eventName, payload) => {
-  //   console.log('Error Coming');
-  //   this.socket.emit(eventName, payload);
-  // };
-
 
   _createClass(Chat, [{
     key: 'render',
     value: function render() {
       var _props = this.props,
           activeUsers = _props.activeUsers,
-          dispatch = _props.dispatch;
-      var _state = this.state,
-          user = _state.user,
-          users = _state.users;
+          dispatch = _props.dispatch,
+          users = _props.users,
+          currentUser = _props.currentUser;
 
       console.log(this.state);
-      //   <Col md={4}>
-      //   <UserList users={users} />
-      // </Col>
-      // <Col md={4}>
-      //   <MessageList {...this.state} />
-      //   <MessageForm user={user} {...this.state} emit={this.emit} />
-      // </Col>
       return _react2.default.createElement(
         'div',
         { id: 'chat_app_container' },
@@ -51872,32 +51917,14 @@ var Chat = function (_Component) {
             )
           )
         ),
-        !user ? _react2.default.createElement(_UserLogin2.default, _extends({}, this.state, {
-          setUser: this.setUser,
-          connect: this.connect,
-          dispatch: dispatch,
-          onUserJoin: this.onUserJoin
-        })) : _react2.default.createElement(
+        (0, _lodash.isEmpty)(currentUser) ? _react2.default.createElement(_UserLogin2.default, { setChatConnection: this.setChatConnection, emit: this.emit }) : _react2.default.createElement(
           'div',
           null,
-          _react2.default.createElement(_SideBar2.default, { activeUsers: activeUsers }),
+          _react2.default.createElement(_SideBar2.default, { openNewConnection: this.openNewConnection, activeUsers: activeUsers, dispatch: dispatch }),
           _react2.default.createElement(
             _reactBootstrap.Grid,
             { className: 'content-container' },
-            _react2.default.createElement(
-              _reactBootstrap.Row,
-              null,
-              _react2.default.createElement(
-                _reactBootstrap.Col,
-                { md: 6 },
-                _react2.default.createElement(_ActiveChat2.default, _extends({ user: user }, this.state, { emit: this.emit }))
-              ),
-              _react2.default.createElement(
-                _reactBootstrap.Col,
-                { md: 6 },
-                _react2.default.createElement(_CurrentUser2.default, null)
-              )
-            )
+            this.renderChats()
           )
         )
       );
@@ -51909,7 +51936,22 @@ var Chat = function (_Component) {
 
 exports.default = (0, _reactRedux.connect)(function (state) {
   return {
-    activeUsers: state.users.activeUsers
+    /*
+     * Active Users that are online to chat with
+     */
+    activeUsers: state.users.activeUsers,
+    /*
+     * The Current user that is logged in. The MAIN user
+     */
+    currentUser: state.users.currentUser,
+    /*
+     * The Users who the current user has started chats with
+     */
+    usersJoined: state.users.usersJoined,
+    /*
+     * The chats that are currently open with the active users
+     */
+    openChats: state.chats.openChats
   };
 })(Chat);
 
@@ -65968,59 +66010,33 @@ var SideBar = function (_Component) {
   _inherits(SideBar, _Component);
 
   function SideBar() {
+    var _ref;
+
+    var _temp, _this, _ret;
+
     _classCallCheck(this, SideBar);
 
-    var _this = _possibleConstructorReturn(this, (SideBar.__proto__ || Object.getPrototypeOf(SideBar)).call(this));
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
 
-    _this.openNewChat = function () {
-      _this.socket = (0, _socket2.default)('http://localhost:3000');
-      _this.socket.on('connect', _this.connect);
-      _this.socket.on('messageAdded', _this.messageAdded);
-    };
-
-    _this.connect = function () {
-      _this.setState({
-        status: 'connected'
-      });
-      console.log('Connected: ' + _this.socket.id);
-    };
-
-    _this.emit = function (eventName, payload) {
-      _this.socket.emit(eventName, payload);
-    };
-
-    _this.disconnect = function () {
-      _this.setState({
-        status: 'disconnected'
-      });
-    };
-
-    _this.messageAdded = function (message) {
-      var messages = _this.state.messages.concat(message);
-      _this.setState({
-        messages: messages
-      });
-    };
-
-    _this.renderActiveList = function () {
-      var activeUsers = _this.props.activeUsers;
+    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = SideBar.__proto__ || Object.getPrototypeOf(SideBar)).call.apply(_ref, [this].concat(args))), _this), _this.renderActiveList = function () {
+      var _this$props = _this.props,
+          activeUsers = _this$props.activeUsers,
+          openNewConnection = _this$props.openNewConnection;
 
       var usersActive = (0, _lodash.map)(activeUsers, function (user, index) {
-        return _react2.default.createElement(_ActiveUsers2.default, { onClick: _this.openNewChat, key: index, username: user.username, profileImage: user.profileImage });
+        return _react2.default.createElement(_ActiveUsers2.default, {
+          onClick: function onClick() {
+            return openNewConnection(user.username);
+          },
+          key: index,
+          username: user.username,
+          profileImage: user.profileImage
+        });
       });
       return usersActive;
-    };
-
-    _this.state = {
-      status: 'disconnected',
-      messages: [{
-        timeStamp: Date.now(),
-        text: 'Welcome to Chatter Box'
-      }],
-      users: [],
-      user: ''
-    };
-    return _this;
+    }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
   _createClass(SideBar, [{
@@ -66063,28 +66079,52 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ActiveUsers = function ActiveUsers(_ref) {
-  var username = _ref.username,
-      profileImage = _ref.profileImage,
-      onClick = _ref.onClick;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  return _react2.default.createElement(
-    "li",
-    { className: "active-user-container", onClick: onClick },
-    _react2.default.createElement("img", { className: "profile-image", src: profileImage, alt: "profile-image" }),
-    _react2.default.createElement(
-      "span",
-      { className: "active-user-title" },
-      username
-    )
-  );
-};
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ActiveUsers = function (_Component) {
+  _inherits(ActiveUsers, _Component);
+
+  function ActiveUsers() {
+    _classCallCheck(this, ActiveUsers);
+
+    return _possibleConstructorReturn(this, (ActiveUsers.__proto__ || Object.getPrototypeOf(ActiveUsers)).apply(this, arguments));
+  }
+
+  _createClass(ActiveUsers, [{
+    key: "render",
+    value: function render() {
+      var _props = this.props,
+          username = _props.username,
+          profileImage = _props.profileImage,
+          onClick = _props.onClick;
+
+      return _react2.default.createElement(
+        "li",
+        { className: "active-user-container", onClick: onClick },
+        _react2.default.createElement("img", { className: "profile-image", src: profileImage, alt: "profile-image" }),
+        _react2.default.createElement(
+          "span",
+          { className: "active-user-title" },
+          username
+        )
+      );
+    }
+  }]);
+
+  return ActiveUsers;
+}(_react.Component);
 
 exports.default = ActiveUsers;
 
@@ -66352,8 +66392,6 @@ var _socket = __webpack_require__(158);
 
 var _socket2 = _interopRequireDefault(_socket);
 
-var _userActions = __webpack_require__(381);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -66370,30 +66408,18 @@ var UserLogin = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, (UserLogin.__proto__ || Object.getPrototypeOf(UserLogin)).call(this));
 
-    _this.componentWillMount = function () {
-      _this.socket = (0, _socket2.default)('http://localhost:3000');
-    };
-
     _this.loginUser = function () {
       var _this$props = _this.props,
-          setUser = _this$props.setUser,
-          dispatch = _this$props.dispatch,
-          connect = _this$props.connect,
-          onUserJoin = _this$props.onUserJoin;
+          setChatConnection = _this$props.setChatConnection,
+          emit = _this$props.emit;
 
       var name = _this.state.username;
-      _this.socket.on('connect', connect(_this.socket));
-      _this.socket.on('userJoined', onUserJoin);
-      setUser({ name: name });
-      _this.emit('userJoined', { name: name });
-      dispatch((0, _userActions.getActiveusers)());
+      setChatConnection();
+      emit('userJoined', { name: name });
+      emit('setMainUser', { name: name });
       _this.setState({
         username: ''
       });
-    };
-
-    _this.emit = function (eventName, payload) {
-      _this.socket.emit(eventName, payload);
     };
 
     _this.onChange = function (e) {
@@ -66465,7 +66491,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getActiveusers = getActiveusers;
-exports.setCurrentUser = setCurrentUser;
+exports.setMainUser = setMainUser;
+exports.setUser = setUser;
+exports.setUsersJoined = setUsersJoined;
 var activeUsers = [{
   username: 'Donald Trump',
   profileImage: 'http://i2.cdn.cnn.com/cnnnext/dam/assets/160118134132-donald-trump-nigel-parry-large-169.jpg'
@@ -66473,13 +66501,13 @@ var activeUsers = [{
   username: 'Barrack Obama',
   profileImage: 'http://cdn.history.com/sites/2/2013/11/obama_color-AB.jpeg'
 }, {
-  username: 'George W Bush',
+  username: 'George W. Bush',
   profileImage: 'http://static.snopes.com/app/uploads/2017/03/George_W_Bush_fb.jpg'
 }, {
   username: 'Bill Clinton',
   profileImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bill_Clinton.jpg/1200px-Bill_Clinton.jpg'
 }, {
-  username: 'George H W Bush',
+  username: 'George H.W. Bush',
   profileImage: 'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE1ODA0OTcxMjgzODc1MzQx/george-h-walker-bush-38066-1-402.jpg'
 }, {
   username: 'Ronald Regan',
@@ -66497,11 +66525,27 @@ function getActiveusers() {
   };
 }
 
-// Sets the current user when logging in
-function setCurrentUser(user) {
+// Sets the main user when we are loggin into the application
+function setMainUser(user) {
   return {
-    type: 'SET_CURRENT_USER',
+    type: 'SET_MAIN_USER',
     payload: user
+  };
+}
+
+// Sets the users when they have been clicked on from the sidebar
+function setUser(user) {
+  return {
+    type: 'SET_USER',
+    payload: user
+  };
+}
+
+// Setting the users who we have joined conversation with
+function setUsersJoined(users) {
+  return {
+    type: 'SET_USERS_JOINED',
+    payload: users
   };
 }
 
@@ -66626,9 +66670,7 @@ var CurrentUser = function (_Component) {
   _createClass(CurrentUser, [{
     key: 'render',
     value: function render() {
-      var _props = this.props,
-          emit = _props.emit,
-          user = _props.user;
+      var username = this.props.username;
 
       return _react2.default.createElement(
         'div',
@@ -66636,7 +66678,7 @@ var CurrentUser = function (_Component) {
         _react2.default.createElement(
           'h2',
           { className: 'chat-user' },
-          'Sam'
+          username
         ),
         _react2.default.createElement(
           'div',
@@ -66808,9 +66850,7 @@ var ActiveChat = function (_Component) {
   _createClass(ActiveChat, [{
     key: 'render',
     value: function render() {
-      var _props = this.props,
-          emit = _props.emit,
-          user = _props.user;
+      var chat = this.props.chat;
 
       return _react2.default.createElement(
         'div',
@@ -66818,7 +66858,7 @@ var ActiveChat = function (_Component) {
         _react2.default.createElement(
           'h2',
           { className: 'chat-user' },
-          'Sam'
+          chat.name
         ),
         _react2.default.createElement(
           'div',
@@ -66946,6 +66986,50 @@ var ActiveChat = function (_Component) {
 }(_react.Component);
 
 exports.default = ActiveChat;
+
+/***/ }),
+/* 387 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.chatReducer = chatReducer;
+
+var _initialState = __webpack_require__(216);
+
+var _initialState2 = _interopRequireDefault(_initialState);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var chatState = _initialState2.default.chats;
+
+function chatReducer() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : chatState;
+  var action = arguments[1];
+
+  switch (action.type) {
+    case 'SET_USER':
+      var newChat = action.payload;
+      var findDupChat = state.openChats.find(function (chat) {
+        return chat.name === newChat.name;
+      });
+      var newChatState = findDupChat ? state.openChats : [].concat(_toConsumableArray(state.openChats), [newChat]);
+      return _extends({}, state, {
+        openChats: newChatState
+      });
+      break;
+  }
+  return state;
+}
 
 /***/ })
 /******/ ]);

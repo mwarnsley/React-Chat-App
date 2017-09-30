@@ -5,10 +5,10 @@ import MessageForm from '../Messages/MessageForm';
 
 class ActiveChat extends Component {
   render() {
-    const {emit, user} = this.props;
+    const {chat} = this.props;
     return (
       <div className="active-chat-container">
-        <h2 className="chat-user">Sam</h2>
+        <h2 className="chat-user">{chat.name}</h2>
         <div className="messages-container">
           <div>Message</div>
           <div>Message</div>

@@ -64,11 +64,21 @@ io.sockets.on('connection', socket => {
       id: socket.id,
       name: payload.name,
     };
-
-    users.push(newUser);
+    const findDupUser = users.find(user => user.name === payload.name);
+    if (!findDupUser) {
+      users.push(newUser);
+    }
     io.emit('userJoined', users);
     console.log(`User Joined ${payload.name}`);
   });
+
+  // Setting the main user after login
+  socket.on('setMainUser', () => {
+    io.emit('setMainUser', users[0]);
+  });
+
+  // Set the user we are having the current conversation with
+  socket.on('setUser', () => {});
 
   connections.push(socket);
   console.log('Connected: %s sockets connected', connections.length);

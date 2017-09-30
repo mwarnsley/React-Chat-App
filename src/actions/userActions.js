@@ -8,7 +8,7 @@ const activeUsers = [
     profileImage: 'http://cdn.history.com/sites/2/2013/11/obama_color-AB.jpeg',
   },
   {
-    username: 'George W Bush',
+    username: 'George W. Bush',
     profileImage: 'http://static.snopes.com/app/uploads/2017/03/George_W_Bush_fb.jpg',
   },
   {
@@ -16,7 +16,7 @@ const activeUsers = [
     profileImage: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Bill_Clinton.jpg/1200px-Bill_Clinton.jpg',
   },
   {
-    username: 'George H W Bush',
+    username: 'George H.W. Bush',
     profileImage:
       'https://www.biography.com/.image/c_fill%2Ccs_srgb%2Cg_face%2Ch_300%2Cq_80%2Cw_300/MTE1ODA0OTcxMjgzODc1MzQx/george-h-walker-bush-38066-1-402.jpg',
   },
@@ -39,10 +39,26 @@ export function getActiveusers() {
   };
 }
 
-// Sets the current user when logging in
-export function setCurrentUser(user) {
+// Sets the main user when we are loggin into the application
+export function setMainUser(user) {
   return {
-    type: 'SET_CURRENT_USER',
+    type: 'SET_MAIN_USER',
     payload: user,
+  };
+}
+
+// Sets the users when they have been clicked on from the sidebar
+export function setUser(user) {
+  return {
+    type: 'SET_USER',
+    payload: user,
+  };
+}
+
+// Setting the users who we have joined conversation with
+export function setUsersJoined(users) {
+  return {
+    type: 'SET_USERS_JOINED',
+    payload: users,
   };
 }

@@ -1,7 +1,8 @@
 export default {
   users: {
-    currentUser: '',
+    currentUser: {},
     activeUsers: [],
+    usersJoined: [],
   },
   chats: {
     openChats: [],

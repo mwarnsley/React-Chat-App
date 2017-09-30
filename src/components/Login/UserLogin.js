@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {FormGroup, FormControl, Button} from 'react-bootstrap';
 import io from 'socket.io-client';
-import {getActiveusers} from '../../actions/userActions';
 
 class UserLogin extends Component {
   constructor() {
@@ -11,23 +10,15 @@ class UserLogin extends Component {
       username: '',
     };
   }
-  componentWillMount = () => {
-    this.socket = io('http://localhost:3000');
-  };
   loginUser = () => {
-    const {setUser, dispatch, connect, onUserJoin} = this.props;
+    const {setChatConnection, emit} = this.props;
     const name = this.state.username;
-    this.socket.on('connect', connect(this.socket));
-    this.socket.on('userJoined', onUserJoin);
-    setUser({name});
-    this.emit('userJoined', {name});
-    dispatch(getActiveusers());
+    setChatConnection();
+    emit('userJoined', {name});
+    emit('setMainUser', {name});
     this.setState({
       username: '',
     });
-  };
-  emit = (eventName, payload) => {
-    this.socket.emit(eventName, payload);
   };
   onChange = e => {
     const username = e.target.value;
