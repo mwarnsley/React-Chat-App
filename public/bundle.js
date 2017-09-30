@@ -66391,7 +66391,7 @@ var UserLogin = function (_Component) {
         _react2.default.createElement(
           _reactBootstrap.FormGroup,
           { bsSize: 'large' },
-          _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onKeyDown: this.handleEnterPress, onChange: this.onChange, value: usernameValue, placeholder: 'Choose a Username' })
+          _react2.default.createElement(_reactBootstrap.FormControl, { autoFocus: true, type: 'text', onKeyDown: this.handleEnterPress, onChange: this.onChange, value: usernameValue, placeholder: 'Choose a Username' })
         ),
         _react2.default.createElement(
           _reactBootstrap.Button,

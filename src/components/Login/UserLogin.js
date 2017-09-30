@@ -36,7 +36,7 @@ class UserLogin extends Component {
       <div id="login_container">
         <h2>User Login</h2>
         <FormGroup bsSize="large">
-          <FormControl type="text" onKeyDown={this.handleEnterPress} onChange={this.onChange} value={usernameValue} placeholder="Choose a Username" />
+          <FormControl autoFocus type="text" onKeyDown={this.handleEnterPress} onChange={this.onChange} value={usernameValue} placeholder="Choose a Username" />
         </FormGroup>
         <Button onClick={this.loginUser}>Login</Button>
       </div>

@@ -37,8 +37,9 @@ io = require('socket.io').listen(server);
 io.sockets.on('connection', socket => {
   // Disconnect function
   socket.once('disconnect', () => {
+    // Looping through the connections and finding out which one was disconnected
     forEach(users, (user, i) => {
-      if (user.id === this.id) {
+      if (user.id === socket.id) {
         users.splice(i, 1);
       }
     });
@@ -60,7 +61,7 @@ io.sockets.on('connection', socket => {
   // Add the user when joining
   socket.on('userJoined', payload => {
     const newUser = {
-      id: this.id,
+      id: socket.id,
       name: payload.name,
     };
 
