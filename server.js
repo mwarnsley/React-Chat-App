@@ -34,6 +34,22 @@ const server = app.listen(PORT, () => {
 io = require('socket.io').listen(server);
 
 io.sockets.on('connection', socket => {
+  // Disconnect function
+  socket.once('disconnect', () => {
+    connections.splice(connections.indexOf(socket), 1);
+    socket.disconnect();
+    console.log('Disconnected: %s sockets connected', connections.length);
+    io.emit('disconnect');
+  });
+
+  // Add Messages to the socket and emit them to the react component
+  socket.on('messageAdded', payload => {
+    const newMessage = {
+      timeStamp: payload.timeStamp,
+      text: payload.text,
+    };
+    io.emit('messageAdded', newMessage);
+  });
   connections.push(socket);
   console.log('Connected: %s sockets connected', connections.length);
 });

@@ -1,20 +1,30 @@
 import React, {Component} from 'react';
-import {Grid, Row, PageHeader} from 'react-bootstrap';
+import {Grid, Row, Col} from 'react-bootstrap';
 import io from 'socket.io-client';
 
 import SideBar from './Sidebar/SideBar';
+import MessageForm from './Messages/MessageForm';
 
 class Chat extends Component {
   constructor() {
     super();
 
     this.state = {
-      status: '',
+      status: 'disconnected',
+      messages: [
+        {
+          timeStamp: Date.now(),
+          text: 'Welcome to Chatter Box',
+        },
+      ],
+      users: [],
+      user: '',
     };
   }
   componentWillMount = () => {
     this.socket = io('http://localhost:3000');
     this.socket.on('connect', this.connect);
+    this.socket.on('messageAdded', this.messageAdded);
   };
   connect = () => {
     this.setState({
@@ -22,7 +32,22 @@ class Chat extends Component {
     });
     console.log(`Connected: ${this.socket.id}`);
   };
+  emit = (eventName, payload) => {
+    this.socket.emit(eventName, payload);
+  };
+  disconnect = () => {
+    this.setState({
+      status: 'disconnected',
+    });
+  };
+  messageAdded = message => {
+    const messages = this.state.messages.concat(message);
+    this.setState({
+      messages,
+    });
+  };
   render() {
+    console.log('State Messages: ', this.state.messages);
     return (
       <div id="chat_app_container">
         <div className="header-container">
@@ -35,6 +60,9 @@ class Chat extends Component {
         <div className="content-container">
           <Grid>
             <Row>
+              <Col md={4}>
+                <MessageForm emit={this.emit} />
+              </Col>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sagittis nunc eu lacinia mollis. Vivamus
               congue purus vitae nulla lobortis dictum. Aenean ut imperdiet enim. Aenean vel mi sodales, suscipit sem
               et, porta lectus. Aliquam nec imperdiet purus. Nam aliquam nibh massa, nec condimentum odio interdum non.
