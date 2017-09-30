@@ -444,11 +444,21 @@ template {
   padding: 0;
   font-family: 'Caslon', Times, serif; }
 
+.content-container {
+  padding-left: 225px;
+  padding-top: 135px; }
+
+/*
+ * Individual Mixin file to be used for SASS mixins
+ */
 .header-container {
-  background: #232323; }
+  background: #232323;
+  position: fixed;
+  width: 100%;
+  z-index: 99; }
   .header-container .chatter-box-title-container {
     font-size: 3.5em;
-    margin: 0 0 50px 0;
+    margin: 0;
     padding: 30px 0 30px 0;
     text-align: center; }
     .header-container .chatter-box-title-container .chatter-logo {
@@ -456,3 +466,50 @@ template {
       margin-right: 20px; }
     .header-container .chatter-box-title-container .chatter-box-title {
       color: #ffffff; }
+
+#side_bar_container {
+  background: #232323;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  overflow-y: auto;
+  top: 118px;
+  width: 200px; }
+  #side_bar_container .sidebar-title-container {
+    -webkit-transition: all 500ms ease-out 0s;
+    -moz-transition: all 500ms ease-out 0s;
+    -ms-transition: all 500ms ease-out 0s;
+    transition: all 500ms ease-out 0s;
+    border-bottom: 1px solid #22ac9c;
+    border-top: 1px solid #22ac9c;
+    color: #ffffff;
+    padding: 20px 0 20px 0;
+    text-align: center; }
+    #side_bar_container .sidebar-title-container .sidebar-title {
+      font-size: 16px;
+      font-weight: 100;
+      letter-spacing: 0.6px; }
+  #side_bar_container .active-user-container {
+    -webkit-transition: all 500ms ease-out 0s;
+    -moz-transition: all 500ms ease-out 0s;
+    -ms-transition: all 500ms ease-out 0s;
+    transition: all 500ms ease-out 0s;
+    border-bottom: 1px solid #22ac9c;
+    color: #ffffff;
+    padding: 10px 0;
+    position: relative; }
+    #side_bar_container .active-user-container .active-user-title {
+      font-size: 16px;
+      font-weight: 100;
+      letter-spacing: 0.6px;
+      position: absolute;
+      top: 23px; }
+    #side_bar_container .active-user-container .profile-image {
+      border-radius: 50%;
+      height: 40px;
+      margin: 0 10px;
+      width: 40px; }
+    #side_bar_container .active-user-container:hover {
+      background: #22ac9c;
+      color: #000000;
+      cursor: pointer; }

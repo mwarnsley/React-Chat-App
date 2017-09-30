@@ -6,5 +6,9 @@
 @import 'normalize';
 // Import the global styles css file
 @import 'global';
+// Importing the mixins to use
+@import 'mixins';
 // Import the css styles for the header
 @import 'header';
+// Import the css styles for the sidebar
+@import 'sidebar';

@@ -1,0 +1,50 @@
+#side_bar_container {
+  background: $primary-black;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  overflow-y: auto;
+  top: 118px;
+  width: 200px;
+
+  .sidebar-title-container {
+    @include transition(all, 500ms, ease-out, 0s);
+    border-bottom: 1px solid $primary-teal;
+    border-top: 1px solid $primary-teal;
+    color: $white;
+    padding: 20px 0 20px 0;
+    text-align: center;
+
+    .sidebar-title {
+      font-size: 16px;
+      font-weight: 100;
+      letter-spacing: 0.6px;
+    }
+  }
+  .active-user-container {
+    @include transition(all, 500ms, ease-out, 0s);
+    border-bottom: 1px solid $primary-teal;
+    color: $white;
+    padding: 10px 0;
+    position: relative;
+
+    .active-user-title {
+      font-size: 16px;
+      font-weight: 100;
+      letter-spacing: 0.6px;
+      position: absolute;
+      top: 23px;
+    }
+    .profile-image {
+      border-radius: 50%;
+      height: 40px;
+      margin: 0 10px;
+      width: 40px;
+    }
+    &:hover {
+      background: $primary-teal;
+      color: $black;
+      cursor: pointer;
+    }
+  }
+}
