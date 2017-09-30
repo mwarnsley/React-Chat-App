@@ -1,6 +1,7 @@
 // Importing the global modules to use to setup the server
 const express = require('express');
 const path = require('path');
+const {forEach} = require('lodash');
 
 // Setting the app variable to the express function for the server
 const app = express();
@@ -36,10 +37,15 @@ io = require('socket.io').listen(server);
 io.sockets.on('connection', socket => {
   // Disconnect function
   socket.once('disconnect', () => {
+    forEach(users, (user, i) => {
+      if (user.id === this.id) {
+        users.splice(i, 1);
+      }
+    });
     connections.splice(connections.indexOf(socket), 1);
     socket.disconnect();
     console.log('Disconnected: %s sockets connected', connections.length);
-    io.emit('disconnect');
+    io.emit('disconnect', users);
   });
 
   // Add Messages to the socket and emit them to the react component

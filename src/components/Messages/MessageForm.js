@@ -10,11 +10,12 @@ class MessageForm extends Component {
     };
   }
   onSubmit = e => {
-    const {emit} = this.props;
+    const {emit, user} = this.props;
     const text = this.state.messageValue.trim();
     emit('messageAdded', {
       timeStamp: Date.now(),
       text,
+      user: user.name,
     });
     this.setState({
       messageValue: '',

@@ -31,6 +31,7 @@ class Chat extends Component {
     const {dispatch} = this.props;
     this.socket = io('http://localhost:3000');
     this.socket.on('connect', this.connect);
+    this.socket.on('disconnect', this.disconnect);
     this.socket.on('messageAdded', this.messageAdded);
     this.socket.on('userJoined', this.onUserJoin);
     dispatch(getActiveusers());
@@ -44,9 +45,10 @@ class Chat extends Component {
   emit = (eventName, payload) => {
     this.socket.emit(eventName, payload);
   };
-  disconnect = () => {
+  disconnect = users => {
     this.setState({
       status: 'disconnected',
+      users,
     });
   };
   setUser = user => {
@@ -83,7 +85,7 @@ class Chat extends Component {
                   </Col>
                   <Col md={4}>
                     <MessageList {...this.state} />
-                    <MessageForm {...this.state} emit={this.emit} />
+                    <MessageForm user={user} {...this.state} emit={this.emit} />
                   </Col>
                 </Row>
               </Grid>

@@ -51779,6 +51779,7 @@ var Chat = function (_Component) {
 
       _this.socket = (0, _socket2.default)('http://localhost:3000');
       _this.socket.on('connect', _this.connect);
+      _this.socket.on('disconnect', _this.disconnect);
       _this.socket.on('messageAdded', _this.messageAdded);
       _this.socket.on('userJoined', _this.onUserJoin);
       dispatch((0, _userActions.getActiveusers)());
@@ -51795,9 +51796,10 @@ var Chat = function (_Component) {
       _this.socket.emit(eventName, payload);
     };
 
-    _this.disconnect = function () {
+    _this.disconnect = function (users) {
       _this.setState({
-        status: 'disconnected'
+        status: 'disconnected',
+        users: users
       });
     };
 
@@ -51873,7 +51875,7 @@ var Chat = function (_Component) {
                   _reactBootstrap.Col,
                   { md: 4 },
                   _react2.default.createElement(_MessageList2.default, this.state),
-                  _react2.default.createElement(_MessageForm2.default, _extends({}, this.state, { emit: this.emit }))
+                  _react2.default.createElement(_MessageForm2.default, _extends({ user: user }, this.state, { emit: this.emit }))
                 )
               )
             )
@@ -66017,7 +66019,7 @@ var SideBar = function (_Component) {
             _react2.default.createElement(
               'span',
               { className: 'sidebar-title' },
-              'Active Users'
+              'Online Users'
             )
           ),
           this.renderActiveList()
@@ -66103,12 +66105,15 @@ var MessageForm = function (_Component) {
     var _this = _possibleConstructorReturn(this, (MessageForm.__proto__ || Object.getPrototypeOf(MessageForm)).call(this));
 
     _this.onSubmit = function (e) {
-      var emit = _this.props.emit;
+      var _this$props = _this.props,
+          emit = _this$props.emit,
+          user = _this$props.user;
 
       var text = _this.state.messageValue.trim();
       emit('messageAdded', {
         timeStamp: Date.now(),
-        text: text
+        text: text,
+        user: user.name
       });
       _this.setState({
         messageValue: ''

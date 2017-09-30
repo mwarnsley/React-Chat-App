@@ -59,7 +59,7 @@ class SideBar extends Component {
       <div id="side_bar_container">
         <ul className="side-bar-content">
           <li className="sidebar-title-container">
-            <span className="sidebar-title">Active Users</span>
+            <span className="sidebar-title">Online Users</span>
           </li>
           {this.renderActiveList()}
         </ul>
