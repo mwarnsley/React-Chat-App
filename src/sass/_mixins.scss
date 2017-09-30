@@ -1,0 +1,44 @@
+/*
+ * Individual Mixin file to be used for SASS mixins
+ */
+
+// Mixin for the border radius property
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  -ms-border-radius: $radius;
+  border-radius: $radius;
+}
+// Mixin for the box shadow property
+@mixin box-shadow($left, $top, $blur, $spread, $color, $inset: false) {
+  @if $inset {
+    -webkit-box-shadow:inset $left $top $blur $spread $color;
+    -moz-box-shadow:inset $left $top $blur $spread $color;
+    box-shadow:inset $left $top $blur $spread $color;
+  } @else {
+    -webkit-box-shadow: $left $top $blur $spread $color;
+    -moz-box-shadow: $left $top $blur $spread $color;
+    box-shadow: $left $top $blur $spread $color;
+  }
+}
+// Mixin for the animation property
+@mixin animation($animation) {
+  -webkit-animation: $animation;
+  -moz-animation: $animation;
+  -ms-animation: $animation;
+  animation: $animation;
+}
+// Mixin for the transition property
+@mixin transition($property, $duration, $timing-function, $delay) {
+  -webkit-transition: $property $duration $timing-function $delay;
+  -moz-transition: $property $duration $timing-function $delay;
+  -ms-transition: $property $duration $timing-function $delay;
+  transition: $property $duration $timing-function $delay;
+}
+// Mixin for the transform property
+@mixin transform($transform) {
+  -webkit-transform: $transform;
+  -moz-transform: $transform;
+  -ms-transform: $transform;
+  transform: $transform;
+}
