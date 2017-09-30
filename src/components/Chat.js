@@ -1,9 +1,27 @@
 import React, {Component} from 'react';
 import {Grid, Row, PageHeader} from 'react-bootstrap';
+import io from 'socket.io-client';
 
 import SideBar from './Sidebar/SideBar';
 
 class Chat extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      status: '',
+    };
+  }
+  componentWillMount = () => {
+    this.socket = io('http://localhost:3000');
+    this.socket.on('connect', this.connect);
+  };
+  connect = () => {
+    this.setState({
+      status: 'connected',
+    });
+    console.log(`Connected: ${this.socket.id}`);
+  };
   render() {
     return (
       <div id="chat_app_container">
