@@ -73,7 +73,7 @@ class Chat extends Component {
       return (
         <Row key={i}>
           <Col md={6}>
-            <ActiveChat chat={chat} />
+            <ActiveChat emit={this.emit} chat={chat} />
           </Col>
           <Col md={6}>
             <CurrentUser username={currentUser.name} />

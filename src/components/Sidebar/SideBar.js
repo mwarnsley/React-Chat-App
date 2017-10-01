@@ -1,12 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {map} from 'lodash';
-import io from 'socket.io-client';
 
 import ActiveUsers from '../Users/ActiveUsers';
 
-class SideBar extends Component {
-  renderActiveList = () => {
-    const {activeUsers, openNewConnection} = this.props;
+const SideBar = ({activeUsers, openNewConnection}) => {
+  // Function to render the active user list on the sidebar
+  const renderActiveList = () => {
     const usersActive = map(activeUsers, (user, index) => {
       return (
         <ActiveUsers
@@ -19,18 +18,16 @@ class SideBar extends Component {
     });
     return usersActive;
   };
-  render() {
-    return (
-      <div id="side_bar_container">
-        <ul className="side-bar-content">
-          <li className="sidebar-title-container">
-            <span className="sidebar-title">Online Users</span>
-          </li>
-          {this.renderActiveList()}
-        </ul>
-      </div>
-    );
-  }
-}
+  return (
+    <div id="side_bar_container">
+      <ul className="side-bar-content">
+        <li className="sidebar-title-container">
+          <span className="sidebar-title">Online Users</span>
+        </li>
+        {renderActiveList()}
+      </ul>
+    </div>
+  );
+};
 
 export default SideBar;

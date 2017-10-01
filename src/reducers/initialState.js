@@ -6,5 +6,6 @@ export default {
   },
   chats: {
     openChats: [],
+    messages: [],
   },
 };

@@ -38,6 +38,7 @@ class MessageForm extends Component {
       <div>
         <FormGroup bsSize="large">
           <FormControl
+            className="send-new-message"
             type="text"
             onKeyDown={this.enterSubmit}
             placeholder="New Message"

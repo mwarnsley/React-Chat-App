@@ -51724,7 +51724,8 @@ exports.default = {
     usersJoined: []
   },
   chats: {
-    openChats: []
+    openChats: [],
+    messages: []
   }
 };
 
@@ -51872,7 +51873,7 @@ var Chat = function (_Component) {
           _react2.default.createElement(
             _reactBootstrap.Col,
             { md: 6 },
-            _react2.default.createElement(_ActiveChat2.default, { chat: chat })
+            _react2.default.createElement(_ActiveChat2.default, { emit: _this.emit, chat: chat })
           ),
           _react2.default.createElement(
             _reactBootstrap.Col,
@@ -65982,17 +65983,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 var _lodash = __webpack_require__(171);
-
-var _socket = __webpack_require__(158);
-
-var _socket2 = _interopRequireDefault(_socket);
 
 var _ActiveUsers = __webpack_require__(376);
 
@@ -66000,71 +65995,43 @@ var _ActiveUsers2 = _interopRequireDefault(_ActiveUsers);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var SideBar = function SideBar(_ref) {
+  var activeUsers = _ref.activeUsers,
+      openNewConnection = _ref.openNewConnection;
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var SideBar = function (_Component) {
-  _inherits(SideBar, _Component);
-
-  function SideBar() {
-    var _ref;
-
-    var _temp, _this, _ret;
-
-    _classCallCheck(this, SideBar);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = SideBar.__proto__ || Object.getPrototypeOf(SideBar)).call.apply(_ref, [this].concat(args))), _this), _this.renderActiveList = function () {
-      var _this$props = _this.props,
-          activeUsers = _this$props.activeUsers,
-          openNewConnection = _this$props.openNewConnection;
-
-      var usersActive = (0, _lodash.map)(activeUsers, function (user, index) {
-        return _react2.default.createElement(_ActiveUsers2.default, {
-          onClick: function onClick() {
-            return openNewConnection(user.username);
-          },
-          key: index,
-          username: user.username,
-          profileImage: user.profileImage
-        });
+  // Function to render the active user list on the sidebar
+  var renderActiveList = function renderActiveList() {
+    var usersActive = (0, _lodash.map)(activeUsers, function (user, index) {
+      return _react2.default.createElement(_ActiveUsers2.default, {
+        onClick: function onClick() {
+          return openNewConnection(user.username);
+        },
+        key: index,
+        username: user.username,
+        profileImage: user.profileImage
       });
-      return usersActive;
-    }, _temp), _possibleConstructorReturn(_this, _ret);
-  }
-
-  _createClass(SideBar, [{
-    key: 'render',
-    value: function render() {
-      return _react2.default.createElement(
-        'div',
-        { id: 'side_bar_container' },
+    });
+    return usersActive;
+  };
+  return _react2.default.createElement(
+    'div',
+    { id: 'side_bar_container' },
+    _react2.default.createElement(
+      'ul',
+      { className: 'side-bar-content' },
+      _react2.default.createElement(
+        'li',
+        { className: 'sidebar-title-container' },
         _react2.default.createElement(
-          'ul',
-          { className: 'side-bar-content' },
-          _react2.default.createElement(
-            'li',
-            { className: 'sidebar-title-container' },
-            _react2.default.createElement(
-              'span',
-              { className: 'sidebar-title' },
-              'Online Users'
-            )
-          ),
-          this.renderActiveList()
+          'span',
+          { className: 'sidebar-title' },
+          'Online Users'
         )
-      );
-    }
-  }]);
-
-  return SideBar;
-}(_react.Component);
+      ),
+      renderActiveList()
+    )
+  );
+};
 
 exports.default = SideBar;
 
@@ -66079,52 +66046,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var ActiveUsers = function ActiveUsers(_ref) {
+  var username = _ref.username,
+      profileImage = _ref.profileImage,
+      onClick = _ref.onClick;
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ActiveUsers = function (_Component) {
-  _inherits(ActiveUsers, _Component);
-
-  function ActiveUsers() {
-    _classCallCheck(this, ActiveUsers);
-
-    return _possibleConstructorReturn(this, (ActiveUsers.__proto__ || Object.getPrototypeOf(ActiveUsers)).apply(this, arguments));
-  }
-
-  _createClass(ActiveUsers, [{
-    key: "render",
-    value: function render() {
-      var _props = this.props,
-          username = _props.username,
-          profileImage = _props.profileImage,
-          onClick = _props.onClick;
-
-      return _react2.default.createElement(
-        "li",
-        { className: "active-user-container", onClick: onClick },
-        _react2.default.createElement("img", { className: "profile-image", src: profileImage, alt: "profile-image" }),
-        _react2.default.createElement(
-          "span",
-          { className: "active-user-title" },
-          username
-        )
-      );
-    }
-  }]);
-
-  return ActiveUsers;
-}(_react.Component);
+  return _react2.default.createElement(
+    "li",
+    { className: "active-user-container", onClick: onClick },
+    _react2.default.createElement("img", { className: "profile-image", src: profileImage, alt: "profile-image" }),
+    _react2.default.createElement(
+      "span",
+      { className: "active-user-title" },
+      username
+    )
+  );
+};
 
 exports.default = ActiveUsers;
 
@@ -66209,6 +66152,7 @@ var MessageForm = function (_Component) {
           _reactBootstrap.FormGroup,
           { bsSize: 'large' },
           _react2.default.createElement(_reactBootstrap.FormControl, {
+            className: 'send-new-message',
             type: 'text',
             onKeyDown: this.enterSubmit,
             placeholder: 'New Message',
@@ -66557,74 +66501,9 @@ function setUsersJoined(users) {
 
 /***/ }),
 /* 383 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _lodash = __webpack_require__(171);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var UserList = function (_Component) {
-  _inherits(UserList, _Component);
-
-  function UserList() {
-    _classCallCheck(this, UserList);
-
-    return _possibleConstructorReturn(this, (UserList.__proto__ || Object.getPrototypeOf(UserList)).apply(this, arguments));
-  }
-
-  _createClass(UserList, [{
-    key: 'render',
-    value: function render() {
-      var users = this.props.users;
-
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-          'h3',
-          null,
-          'Users (',
-          users.length,
-          ')'
-        ),
-        _react2.default.createElement(
-          'ul',
-          null,
-          (0, _lodash.map)(users, function (user, i) {
-            return _react2.default.createElement(
-              'li',
-              { key: i },
-              user.name
-            );
-          })
-        )
-      );
-    }
-  }]);
-
-  return UserList;
-}(_react.Component);
-
-exports.default = UserList;
+throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/marcus/Desktop/React-Chat-App/src/components/Users/UserList.js'");
 
 /***/ }),
 /* 384 */,
@@ -66850,7 +66729,9 @@ var ActiveChat = function (_Component) {
   _createClass(ActiveChat, [{
     key: 'render',
     value: function render() {
-      var chat = this.props.chat;
+      var _props = this.props,
+          chat = _props.chat,
+          emit = _props.emit;
 
       return _react2.default.createElement(
         'div',
@@ -66972,11 +66853,7 @@ var ActiveChat = function (_Component) {
         _react2.default.createElement(
           'div',
           { className: 'send-message-container' },
-          _react2.default.createElement(
-            _reactBootstrap.FormGroup,
-            { bsSize: 'large' },
-            _react2.default.createElement(_reactBootstrap.FormControl, { className: 'send-new-message', type: 'text', placeholder: 'New Message' })
-          )
+          _react2.default.createElement(_MessageForm2.default, { emit: emit, user: chat })
         )
       );
     }
