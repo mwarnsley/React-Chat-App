@@ -49585,7 +49585,13 @@ var Chat = function (_Component) {
       });
     };
 
-    _this.messageAdded = function (message) {};
+    _this.messageAdded = function (updateMessages) {
+      _this.setState({
+        chats: _extends({}, _this.state.chats, {
+          openChats: updateMessages
+        })
+      });
+    };
 
     _this.openNewChat = function (newUserChat) {
       _this.setState({
@@ -49647,7 +49653,7 @@ var Chat = function (_Component) {
       var activeUsers = this.state.users.activeUsers;
       var openChats = this.state.chats.openChats;
       var users = this.state.users;
-      console.log(this.state);
+      console.log(this.state.chats);
       return _react2.default.createElement(
         'div',
         { id: 'chat_app_container' },
@@ -63840,14 +63846,16 @@ var MessageForm = function (_Component) {
     _this.onSubmit = function (e) {
       var _this$props = _this.props,
           emit = _this$props.emit,
-          user = _this$props.user;
+          user = _this$props.user,
+          chatID = _this$props.chatID;
 
       var text = _this.state.messageValue.trim();
       emit('setUser', user);
       emit('messageAdded', {
         timeStamp: Date.now(),
+        user: user.name,
         text: text,
-        user: user.name
+        chatID: chatID
       });
       _this.setState({
         messageValue: ''
@@ -64005,13 +64013,16 @@ var Message = function Message(_ref) {
 
     return newDT;
   };
+  var classes = message.type === 'sent' ? 'message-sent' : 'message-received';
   return _react2.default.createElement(
     'div',
-    { className: 'message' },
-    _react2.default.createElement('strong', null),
-    formatTime(message.timeStamp),
-    ' - ',
-    message.text
+    null,
+    _react2.default.createElement(
+      'div',
+      { className: classes },
+      message.text
+    ),
+    _react2.default.createElement('div', { className: 'clearfix' })
   );
 };
 
@@ -64187,7 +64198,8 @@ var User = function (_Component) {
     value: function render() {
       var _props = this.props,
           user = _props.user,
-          emit = _props.emit;
+          emit = _props.emit,
+          chatID = _props.chatID;
 
       return _react2.default.createElement(
         'div',
@@ -64200,13 +64212,12 @@ var User = function (_Component) {
         _react2.default.createElement(
           'div',
           { className: 'messages-container' },
-          _react2.default.createElement(_MessageList2.default, { messages: user.received }),
-          _react2.default.createElement(_MessageList2.default, { messages: user.sent })
+          _react2.default.createElement(_MessageList2.default, { messages: user.messages })
         ),
         _react2.default.createElement(
           'div',
           { className: 'send-message-container' },
-          _react2.default.createElement(_MessageForm2.default, { emit: emit, user: user })
+          _react2.default.createElement(_MessageForm2.default, { chatID: chatID, emit: emit, user: user })
         )
       );
     }
@@ -64266,7 +64277,8 @@ var MainUser = function (_Component) {
     value: function render() {
       var _props = this.props,
           user = _props.user,
-          emit = _props.emit;
+          emit = _props.emit,
+          chatID = _props.chatID;
 
       return _react2.default.createElement(
         'div',
@@ -64279,13 +64291,12 @@ var MainUser = function (_Component) {
         _react2.default.createElement(
           'div',
           { className: 'messages-container' },
-          _react2.default.createElement(_MessageList2.default, { messages: user.received }),
-          _react2.default.createElement(_MessageList2.default, { messages: user.sent })
+          _react2.default.createElement(_MessageList2.default, { messages: user.messages })
         ),
         _react2.default.createElement(
           'div',
           { className: 'send-message-container' },
-          _react2.default.createElement(_MessageForm2.default, { emit: emit, user: user })
+          _react2.default.createElement(_MessageForm2.default, { chatID: chatID, emit: emit, user: user })
         )
       );
     }
@@ -64722,12 +64733,12 @@ var UserContainer = function (_Component) {
           _react2.default.createElement(
             _reactBootstrap.Col,
             { md: 6 },
-            _react2.default.createElement(_User2.default, { emit: emit, user: activeUserChat })
+            _react2.default.createElement(_User2.default, { chatID: chat.chatID, emit: emit, user: activeUserChat })
           ),
           _react2.default.createElement(
             _reactBootstrap.Col,
             { md: 6 },
-            _react2.default.createElement(_MainUser2.default, { emit: emit, user: main })
+            _react2.default.createElement(_MainUser2.default, { chatID: chat.chatID, emit: emit, user: main })
           )
         );
       }) : null;

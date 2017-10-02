@@ -1,7 +1,7 @@
 // Importing the global modules to use to setup the server
 const express = require('express');
 const path = require('path');
-const {forEach} = require('lodash');
+const {forEach, map} = require('lodash');
 
 // Setting the app variable to the express function for the server
 const app = express();
@@ -18,7 +18,7 @@ const users = [];
 // Setting the main user for the chats
 let mainUser = {};
 // Setting the currently opened chats
-const openChats = [];
+let openChats = [];
 // Setting the io variable for connecting to socket.io
 let io;
 
@@ -84,19 +84,18 @@ io.sockets.on('connection', socket => {
   // Opening a new chat connection between the main user and active user
   socket.on('openNewChat', username => {
     const getUser = users.find(user => user.name === username);
+    // Constructing the new user chat between the main user and the user who is selected
     const newUserChat = {
       chatID: getUser.id,
       [getUser.name]: {
         id: getUser.id,
         name: getUser.name,
-        received: [],
-        sent: [],
+        messages: [],
       },
       [mainUser.name]: {
         id: mainUser.id,
         name: mainUser.name,
-        received: [],
-        sent: [],
+        messages: [],
       },
     };
 
@@ -107,12 +106,76 @@ io.sockets.on('connection', socket => {
 
   // Add Messages to the socket and emit them to the react component
   socket.on('messageAdded', payload => {
-    const newMessage = {
-      timeStamp: payload.timeStamp,
-      text: payload.text,
-      user: payload.user,
-    };
-    io.emit('messageAdded', newMessage);
+    // Setting a variable to get the non main user who is sending or receiving a message
+    const getNonMainUser = users.find(user => user.id === payload.chatID).name;
+    /*
+     * Here we are mapping through the open chats and updating the sent and received for the users
+     * We are using the ID to grab the correct chat to update and checkin to see who sends the message
+     * If it is the main user we are updating it's sent and the other users received
+     * If it is the other user in the chat we are updating their sent and the main users received
+     */
+    const updateChat = map(openChats, chat => {
+      if (chat.chatID === payload.chatID) {
+        if (payload.user === mainUser.name) {
+          return {
+            ...chat,
+            [getNonMainUser]: {
+              ...chat[getNonMainUser],
+              messages: [
+                ...chat[getNonMainUser].messages,
+                {
+                  timeStamp: payload.timeStamp,
+                  text: payload.text,
+                  type: 'received',
+                },
+              ],
+            },
+            [mainUser.name]: {
+              ...chat[mainUser.name],
+              messages: [
+                ...chat[mainUser.name].messages,
+                {
+                  timeStamp: payload.timeStamp,
+                  text: payload.text,
+                  type: 'sent',
+                },
+              ],
+            },
+          };
+        }
+        return {
+          ...chat,
+          [getNonMainUser]: {
+            ...chat[getNonMainUser],
+            messages: [
+              ...chat[getNonMainUser].messages,
+              {
+                timeStamp: payload.timeStamp,
+                text: payload.text,
+                type: 'sent',
+              },
+            ],
+          },
+          [mainUser.name]: {
+            ...chat[mainUser.name],
+            messages: [
+              ...chat[mainUser.name].messages,
+              {
+                timeStamp: payload.timeStamp,
+                text: payload.text,
+                type: 'received',
+              },
+            ],
+          },
+        };
+      }
+      return chat;
+    });
+
+    // We are setting the opent chats to the new array formed from mapping and updating the chats
+    openChats = updateChat;
+
+    io.emit('messageAdded', openChats);
   });
 
   connections.push(socket);

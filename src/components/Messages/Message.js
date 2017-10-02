@@ -25,10 +25,11 @@ const Message = ({message}) => {
 
     return newDT;
   };
+  const classes = message.type === 'sent' ? 'message-sent' : 'message-received';
   return (
-    <div className="message">
-      <strong />
-      {formatTime(message.timeStamp)} - {message.text}
+    <div>
+      <div className={classes}>{message.text}</div>
+      <div className="clearfix" />
     </div>
   );
 };

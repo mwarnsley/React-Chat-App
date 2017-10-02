@@ -19,10 +19,10 @@ class UserContainer extends Component {
             return (
               <Row key={i}>
                 <Col md={6}>
-                  <User emit={emit} user={activeUserChat} />
+                  <User chatID={chat.chatID} emit={emit} user={activeUserChat} />
                 </Col>
                 <Col md={6}>
-                  <MainUser emit={emit} user={main} />
+                  <MainUser chatID={chat.chatID} emit={emit} user={main} />
                 </Col>
               </Row>
             );

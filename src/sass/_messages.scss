@@ -1,8 +1,19 @@
-.message {
-  background: $primary-teal;
-  border-radius: 5px;
-  color: $white;
-  margin-bottom: 10px;
-  padding: 15px;
-  width: 55%;
+.message-list {
+  .message-sent {
+    background: $primary-teal;
+    border-radius: 5px;
+    color: $white;
+    float: right;
+    margin-bottom: 10px;
+    padding: 15px;
+    width: 55%;
+  }
+  .message-received {
+    background: $white;
+    border-radius: 5px;
+    color: $primary-black;
+    margin-bottom: 10px;
+    padding: 15px;
+    width: 55%;
+  }
 }

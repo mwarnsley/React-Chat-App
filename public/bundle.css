@@ -565,10 +565,19 @@ body {
   -ms-border-radius: 0;
   border-radius: 0; }
 
-.message {
+.message-list .message-sent {
   background: #22ac9c;
   border-radius: 5px;
   color: #ffffff;
+  float: right;
+  margin-bottom: 10px;
+  padding: 15px;
+  width: 55%; }
+
+.message-list .message-received {
+  background: #ffffff;
+  border-radius: 5px;
+  color: #232323;
   margin-bottom: 10px;
   padding: 15px;
   width: 55%; }

@@ -60,7 +60,14 @@ class Chat extends Component {
       },
     });
   };
-  messageAdded = message => {};
+  messageAdded = updateMessages => {
+    this.setState({
+      chats: {
+        ...this.state.chats,
+        openChats: updateMessages,
+      },
+    });
+  };
   openNewChat = newUserChat => {
     this.setState({
       chats: {
@@ -99,7 +106,7 @@ class Chat extends Component {
     const activeUsers = this.state.users.activeUsers;
     const openChats = this.state.chats.openChats;
     const users = this.state.users;
-    console.log(this.state);
+    console.log(this.state.chats);
     return (
       <div id="chat_app_container">
         <div className="header-container">
