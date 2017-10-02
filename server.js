@@ -15,6 +15,10 @@ const PORT = process.env.PORT || 3000;
 const connections = [];
 // Setting the users array for the amount of users
 const users = [];
+// Setting the main user for the chats
+let mainUser = {};
+// Setting the currently opened chats
+const openChats = [];
 // Setting the io variable for connecting to socket.io
 let io;
 
@@ -49,16 +53,6 @@ io.sockets.on('connection', socket => {
     io.emit('disconnect', users);
   });
 
-  // Add Messages to the socket and emit them to the react component
-  socket.on('messageAdded', payload => {
-    const newMessage = {
-      timeStamp: payload.timeStamp,
-      text: payload.text,
-      user: payload.user,
-    };
-    io.emit('messageAdded', newMessage);
-  });
-
   // Add the user when joining
   socket.on('userJoined', payload => {
     const newUser = {
@@ -74,7 +68,8 @@ io.sockets.on('connection', socket => {
 
   // Sets the main user who is logged in
   socket.on('setMainUser', () => {
-    io.emit('setMainUser', users[0]);
+    mainUser = users[0];
+    io.emit('setMainUser', mainUser);
   });
 
   // Set the user we are having the current conversation with
@@ -88,11 +83,36 @@ io.sockets.on('connection', socket => {
 
   // Opening a new chat connection between the main user and active user
   socket.on('openNewChat', username => {
-    io.emit('openNewChat', username);
+    const getUser = users.find(user => user.name === username);
+    const newUserChat = {
+      chatID: getUser.id,
+      [getUser.name]: {
+        id: getUser.id,
+        name: getUser.name,
+        received: [],
+        sent: [],
+      },
+      [mainUser.name]: {
+        id: mainUser.id,
+        name: mainUser.name,
+        received: [],
+        sent: [],
+      },
+    };
+
+    openChats.push(newUserChat);
+
+    io.emit('openNewChat', newUserChat);
   });
 
-  socket.on('renderChats', () => {
-    io.emit('renderChats');
+  // Add Messages to the socket and emit them to the react component
+  socket.on('messageAdded', payload => {
+    const newMessage = {
+      timeStamp: payload.timeStamp,
+      text: payload.text,
+      user: payload.user,
+    };
+    io.emit('messageAdded', newMessage);
   });
 
   connections.push(socket);

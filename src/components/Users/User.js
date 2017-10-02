@@ -15,7 +15,7 @@ class User extends Component {
           <MessageList messages={user.sent} />
         </div>
         <div className="send-message-container">
-          <MessageForm emit={emit} user={chat} />
+          <MessageForm emit={emit} user={user} />
         </div>
       </div>
     );
