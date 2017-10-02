@@ -119,7 +119,8 @@ io.sockets.on('connection', socket => {
         if (payload.user === mainUser.name) {
           return Object.assign({}, chat, {
             [getNonMainUser]: {
-              ...chat[getNonMainUser],
+              id: chat[getNonMainUser].id,
+              name: chat[getNonMainUser].name,
               messages: [
                 ...chat[getNonMainUser].messages,
                 {
@@ -130,7 +131,8 @@ io.sockets.on('connection', socket => {
               ],
             },
             [mainUser.name]: {
-              ...chat[mainUser.name],
+              id: chat[mainUser.name].id,
+              name: chat[mainUser.name].name,
               messages: [
                 ...chat[mainUser.name].messages,
                 {
@@ -144,7 +146,8 @@ io.sockets.on('connection', socket => {
         }
         return Object.assign({}, chat, {
           [getNonMainUser]: {
-            ...chat[getNonMainUser],
+            id: chat[getNonMainUser].id,
+            name: chat[getNonMainUser].name,
             messages: [
               ...chat[getNonMainUser].messages,
               {
@@ -155,7 +158,8 @@ io.sockets.on('connection', socket => {
             ],
           },
           [mainUser.name]: {
-            ...chat[mainUser.name],
+            id: chat[mainUser.name].id,
+            name: chat[mainUser.name].name,
             messages: [
               ...chat[mainUser.name].messages,
               {
