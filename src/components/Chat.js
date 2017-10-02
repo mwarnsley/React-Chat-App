@@ -3,16 +3,15 @@ import {connect} from 'react-redux';
 import {Grid, Row, Col} from 'react-bootstrap';
 import io from 'socket.io-client';
 import {isEmpty, map} from 'lodash';
-
+// Import the components to use inside of this component
 import SideBar from './Sidebar/SideBar';
-import MessageForm from './Messages/MessageForm';
-import MessageList from './Messages/MessageList';
 import UserLogin from './Login/UserLogin';
-import UserList from './Users/UserList';
-import ActiveChat from './Chats/ActiveChat';
-import CurrentUser from './Users/CurrentUser';
+import User from './Users/User';
+import MainUser from './Users/MainUser';
 
+// Importing the actions to use inside of this component
 import {setUser, setMainUser, setUsersJoined, getActiveusers} from '../actions/userActions';
+import {sendNewMessage, openChat} from '../actions/chatActions';
 
 class Chat extends Component {
   constructor() {
@@ -21,6 +20,10 @@ class Chat extends Component {
       status: 'disconnected',
     };
   }
+  componentDidMount = () => {
+    const {dispatch} = this.props;
+    dispatch(getActiveusers());
+  };
   connect = () => {
     this.setState({
       status: 'connected',
@@ -30,62 +33,95 @@ class Chat extends Component {
   disconnect = users => {
     this.setState({
       status: 'disconnected',
-      users,
     });
-  };
-  setUser = user => {
-    const {dispatch} = this.props;
-    dispatch(setUser(user));
   };
   setMainUser = user => {
     const {dispatch} = this.props;
     dispatch(setMainUser(user));
+  };
+  setUser = user => {
+    const {dispatch} = this.props;
+    dispatch(setUser(user));
   };
   onUserJoin = users => {
     const {dispatch} = this.props;
     dispatch(setUsersJoined(users));
   };
   messageAdded = message => {
-    const messages = this.state.messages.concat(message);
-    this.setState({messages});
+    const {dispatch} = this.props;
+    dispatch(sendNewMessage(message));
   };
   emit = (eventName, payload) => {
     this.socket.emit(eventName, payload);
   };
   setChatConnection = () => {
-    const {dispatch} = this.props;
-    this.socket = io('http://localhost:3000');
+    this.socket = io('http://localhost:3000', {forceNew: true});
     this.socket.on('connect', this.connect);
     this.socket.on('disconnect', this.disconnect);
     this.socket.on('messageAdded', this.messageAdded);
     this.socket.on('userJoined', this.onUserJoin);
     this.socket.on('setUser', this.setUser);
     this.socket.on('setMainUser', this.setMainUser);
-    dispatch(getActiveusers());
+    this.socket.on('openNewChat', this.openNewChat);
+    this.socket.on('renderChats', this.renderChat);
   };
   openNewConnection = name => {
-    this.setUser({name: name});
-    this.emit('userJoined', {name: name});
+    const {usersJoined} = this.props;
+    const findDupUser = usersJoined.find(user => user.name === name);
+    if (findDupUser) {
+      return;
+    }
+    this.setChatConnection();
+    this.emit('userJoined', {name});
+    this.emit('setUser', {name});
+    this.emit('openNewChat', name);
+    this.socket.removeAllListeners();
   };
-  renderChats = () => {
-    const {openChats, currentUser} = this.props;
+  openNewChat = username => {
+    const {usersJoined, mainUser, dispatch} = this.props;
+    const getUser = usersJoined.find(user => user.name === username);
+    const newUserChat = {
+      chatID: getUser.id,
+      [getUser.name]: {
+        id: getUser.id,
+        name: getUser.name,
+        received: [],
+        sent: [],
+      },
+      [mainUser.name]: {
+        id: mainUser.id,
+        name: mainUser.name,
+        received: [],
+        sent: [],
+      },
+    };
+    dispatch(openChat(newUserChat));
+  };
+  renderChat = () => {
+    const {openChats, mainUser, usersJoined} = this.props;
+    console.log('THIS IS RUNNING');
     const chats = map(openChats, (chat, i) => {
+      const findUserChat = usersJoined.find(user => user.id === chat.chatID);
+      const main = chat[mainUser.name];
+      const activeUserChat = chat[findUserChat.name];
       return (
         <Row key={i}>
           <Col md={6}>
-            <ActiveChat emit={this.emit} chat={chat} />
+            <User emit={this.emit} user={activeUserChat} />
           </Col>
           <Col md={6}>
-            <CurrentUser username={currentUser.name} />
+            <MainUser emit={this.emit} user={main} />
           </Col>
         </Row>
       );
     });
     return chats;
   };
+  emitChats = () => {
+    this.emit('renderChats');
+  };
   render() {
-    const {activeUsers, dispatch, users, currentUser} = this.props;
-    console.log(this.state);
+    const {activeUsers, dispatch, users, mainUser, usersJoined} = this.props;
     return (
       <div id="chat_app_container">
         <div className="header-container">
@@ -94,12 +130,12 @@ class Chat extends Component {
             <span className="chatter-box-title">Chatter Box</span>
           </h1>
         </div>
-        {isEmpty(currentUser) ? (
+        {isEmpty(mainUser) ? (
           <UserLogin setChatConnection={this.setChatConnection} emit={this.emit} />
         ) : (
           <div>
             <SideBar openNewConnection={this.openNewConnection} activeUsers={activeUsers} dispatch={dispatch} />
-            <Grid className="content-container">{this.renderChats()}</Grid>
+            <Grid className="content-container">{usersJoined.length > 1 ? this.emitChats() : null}</Grid>
           </div>
         )}
       </div>
@@ -113,9 +149,9 @@ export default connect(state => ({
    */
   activeUsers: state.users.activeUsers,
   /*
-   * The Current user that is logged in. The MAIN user
+   * The Main user that is logged in.
    */
-  currentUser: state.users.currentUser,
+  mainUser: state.users.mainUser,
   /*
    * The Users who the current user has started chats with
    */

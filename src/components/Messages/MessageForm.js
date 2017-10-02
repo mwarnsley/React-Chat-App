@@ -12,6 +12,7 @@ class MessageForm extends Component {
   onSubmit = e => {
     const {emit, user} = this.props;
     const text = this.state.messageValue.trim();
+    emit('setUser', user);
     emit('messageAdded', {
       timeStamp: Date.now(),
       text,
@@ -46,9 +47,6 @@ class MessageForm extends Component {
             onChange={this.onChange}
           />
         </FormGroup>
-        <Button bsSize="large" onClick={this.onSubmit}>
-          SEND
-        </Button>
       </div>
     );
   }

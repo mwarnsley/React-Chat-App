@@ -54,6 +54,7 @@ io.sockets.on('connection', socket => {
     const newMessage = {
       timeStamp: payload.timeStamp,
       text: payload.text,
+      user: payload.user,
     };
     io.emit('messageAdded', newMessage);
   });
@@ -64,21 +65,35 @@ io.sockets.on('connection', socket => {
       id: socket.id,
       name: payload.name,
     };
-    const findDupUser = users.find(user => user.name === payload.name);
-    if (!findDupUser) {
-      users.push(newUser);
-    }
+
+    users.push(newUser);
+
     io.emit('userJoined', users);
     console.log(`User Joined ${payload.name}`);
   });
 
-  // Setting the main user after login
+  // Sets the main user who is logged in
   socket.on('setMainUser', () => {
     io.emit('setMainUser', users[0]);
   });
 
   // Set the user we are having the current conversation with
-  socket.on('setUser', () => {});
+  socket.on('setUser', user => {
+    const userSet = {
+      id: socket.id,
+      name: user.name,
+    };
+    io.emit('setUser', userSet);
+  });
+
+  // Opening a new chat connection between the main user and active user
+  socket.on('openNewChat', username => {
+    io.emit('openNewChat', username);
+  });
+
+  socket.on('renderChats', () => {
+    io.emit('renderChats');
+  });
 
   connections.push(socket);
   console.log('Connected: %s sockets connected', connections.length);

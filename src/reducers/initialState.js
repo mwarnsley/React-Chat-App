@@ -3,9 +3,9 @@ export default {
     currentUser: {},
     activeUsers: [],
     usersJoined: [],
+    mainUser: {},
   },
   chats: {
     openChats: [],
-    messages: [],
   },
 };

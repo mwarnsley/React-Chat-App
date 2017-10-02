@@ -39,18 +39,18 @@ export function getActiveusers() {
   };
 }
 
-// Sets the main user when we are loggin into the application
-export function setMainUser(user) {
-  return {
-    type: 'SET_MAIN_USER',
-    payload: user,
-  };
-}
-
 // Sets the users when they have been clicked on from the sidebar
 export function setUser(user) {
   return {
     type: 'SET_USER',
+    payload: user,
+  };
+}
+
+// Sets the main user being logged in
+export function setMainUser(user) {
+  return {
+    type: 'SET_MAIN_USER',
     payload: user,
   };
 }

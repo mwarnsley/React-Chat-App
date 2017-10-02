@@ -18,11 +18,12 @@ const SideBar = ({activeUsers, openNewConnection}) => {
     });
     return usersActive;
   };
+  const numberActiveUsers = activeUsers.length;
   return (
     <div id="side_bar_container">
       <ul className="side-bar-content">
         <li className="sidebar-title-container">
-          <span className="sidebar-title">Online Users</span>
+          <span className="sidebar-title">Online Users ({numberActiveUsers})</span>
         </li>
         {renderActiveList()}
       </ul>

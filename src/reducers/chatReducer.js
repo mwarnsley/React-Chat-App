@@ -1,16 +1,35 @@
 import initialState from './initialState';
+import {map} from 'lodash';
 
 const chatState = initialState.chats;
 
 export function chatReducer(state = chatState, action) {
   switch (action.type) {
-    case 'SET_USER':
+    case 'OPEN_NEW_CHAT':
       const newChat = action.payload;
-      const findDupChat = state.openChats.find(chat => chat.name === newChat.name);
-      const newChatState = findDupChat ? state.openChats : [...state.openChats, newChat];
       return {
         ...state,
-        openChats: newChatState,
+        openChats: [...state.openChats, newChat],
+      };
+      break;
+    case 'SEND_NEW_MESSAGE':
+      const newMessage = action.payload;
+      const openChats = state.openChats;
+      const newMessageState = map(openChats, chat => {
+        if (chat.name === newMessage.user) {
+          return {
+            ...chat,
+            messages: {
+              received: [...chat.messages.received],
+              sent: [...chat.messages.sent, newMessage],
+            },
+          };
+        }
+        return chat;
+      });
+      return {
+        ...state,
+        openChats: newMessageState,
       };
       break;
   }

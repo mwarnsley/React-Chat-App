@@ -15,16 +15,13 @@ class UserLogin extends Component {
     const name = this.state.username;
     setChatConnection();
     emit('userJoined', {name});
+    emit('setUser', {name});
     emit('setMainUser', {name});
-    this.setState({
-      username: '',
-    });
+    this.setState({username: ''});
   };
   onChange = e => {
     const username = e.target.value;
-    this.setState({
-      username,
-    });
+    this.setState({username});
   };
   handleEnterPress = e => {
     if (e.keyCode === 13 || e.which === 13) {

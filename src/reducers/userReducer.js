@@ -11,18 +11,25 @@ export function userReducer(state = userState, action) {
         activeUsers,
       };
       break;
-    case 'SET_MAIN_USER':
+    case 'SET_USERS_JOINED':
+      const usersJoined = action.payload;
+      return {
+        ...state,
+        usersJoined,
+      };
+      break;
+    case 'SET_USER':
       const currentUser = action.payload;
       return {
         ...state,
         currentUser,
       };
       break;
-    case 'SET_USERS_JOINED':
-      const usersJoined = action.payload;
+    case 'SET_MAIN_USER':
+      const mainUser = action.payload;
       return {
         ...state,
-        usersJoined,
+        mainUser,
       };
       break;
   }
