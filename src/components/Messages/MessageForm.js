@@ -2,13 +2,9 @@ import React, {Component} from 'react';
 import {FormGroup, FormControl, Button} from 'react-bootstrap';
 
 class MessageForm extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      messageValue: '',
-    };
-  }
+  state = {
+    messageValue: '',
+  };
   onSubmit = e => {
     const {emit, user, chatID} = this.props;
     const text = this.state.messageValue.trim();

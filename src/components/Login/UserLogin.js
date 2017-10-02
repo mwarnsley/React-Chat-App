@@ -3,13 +3,9 @@ import {FormGroup, FormControl, Button} from 'react-bootstrap';
 import io from 'socket.io-client';
 
 class UserLogin extends Component {
-  constructor() {
-    super();
-
-    this.state = {
-      username: '',
-    };
-  }
+  state = {
+    username: '',
+  };
   loginUser = () => {
     const {setChatConnection, emit} = this.props;
     const name = this.state.username;

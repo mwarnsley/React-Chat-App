@@ -10,21 +10,18 @@ import UserLogin from './Login/UserLogin';
 import UserContainer from './Users/UserContainer';
 
 class Chat extends Component {
-  constructor() {
-    super();
-    this.state = {
-      status: 'disconnected',
-      users: {
-        currentUser: {},
-        activeUsers,
-        usersJoined: [],
-        mainUser: {},
-      },
-      chats: {
-        openChats: [],
-      },
-    };
-  }
+  state = {
+    status: 'disconnected',
+    users: {
+      currentUser: {},
+      activeUsers,
+      usersJoined: [],
+      mainUser: {},
+    },
+    chats: {
+      openChats: [],
+    },
+  };
   connect = () => {
     this.setState({
       status: 'connected',
@@ -101,6 +98,7 @@ class Chat extends Component {
     this.emit('openNewChat', name);
     this.socket.removeAllListeners();
   };
+
   render() {
     const mainUser = this.state.users.mainUser;
     const activeUsers = this.state.users.activeUsers;
