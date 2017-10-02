@@ -49734,7 +49734,6 @@ var Chat = function (_Component) {
       var activeUsers = this.state.users.activeUsers;
       var openChats = this.state.chats.openChats;
       var users = this.state.users;
-      console.log(this.state.chats);
       return _react2.default.createElement(
         'div',
         { id: 'chat_app_container' },
