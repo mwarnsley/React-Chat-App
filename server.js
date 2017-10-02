@@ -117,8 +117,7 @@ io.sockets.on('connection', socket => {
     const updateChat = map(openChats, chat => {
       if (chat.chatID === payload.chatID) {
         if (payload.user === mainUser.name) {
-          return {
-            ...chat,
+          return Object.assign({}, chat, {
             [getNonMainUser]: {
               ...chat[getNonMainUser],
               messages: [
@@ -141,10 +140,9 @@ io.sockets.on('connection', socket => {
                 },
               ],
             },
-          };
+          });
         }
-        return {
-          ...chat,
+        return Object.assign({}, chat, {
           [getNonMainUser]: {
             ...chat[getNonMainUser],
             messages: [
@@ -167,7 +165,7 @@ io.sockets.on('connection', socket => {
               },
             ],
           },
-        };
+        });
       }
       return chat;
     });
